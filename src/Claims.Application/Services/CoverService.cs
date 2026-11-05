@@ -1,10 +1,14 @@
 using Claims.Application.Contracts;
 using Claims.Application.Interfaces;
 using Claims.Domain;
+using FluentValidation;
 
 namespace Claims.Application.Services;
 
-public class CoverService(ICoverRepository covers, IAuditer auditer) : ICoverService
+public class CoverService(
+    ICoverRepository covers,
+    IValidator<CreateCoverRequest> validator,
+    IAuditer auditer) : ICoverService
 {
     public async Task<IReadOnlyList<CoverResponse>> GetAllAsync(CancellationToken cancellationToken)
     {
@@ -20,13 +24,17 @@ public class CoverService(ICoverRepository covers, IAuditer auditer) : ICoverSer
 
     public async Task<CoverResponse> CreateAsync(CreateCoverRequest request, CancellationToken cancellationToken)
     {
+        await validator.ValidateAndThrowAsync(request, cancellationToken);
+
+        var startDate = request.StartDate.AsUtc();
+        var endDate = request.EndDate.AsUtc();
         var cover = new Cover
         {
             Id = Guid.NewGuid().ToString(),
-            StartDate = request.StartDate,
-            EndDate = request.EndDate,
+            StartDate = startDate,
+            EndDate = endDate,
             Type = request.Type,
-            Premium = PremiumCalculator.Compute(request.StartDate, request.EndDate, request.Type)
+            Premium = PremiumCalculator.Compute(startDate, endDate, request.Type)
         };
 
         await covers.AddAsync(cover, cancellationToken);
@@ -46,6 +54,10 @@ public class CoverService(ICoverRepository covers, IAuditer auditer) : ICoverSer
         return deleted;
     }
 
-    public decimal ComputePremium(DateTime startDate, DateTime endDate, CoverType coverType) =>
-        PremiumCalculator.Compute(startDate, endDate, coverType);
+    public async Task<decimal> ComputePremiumAsync(CreateCoverRequest request, CancellationToken cancellationToken)
+    {
+        await validator.ValidateAndThrowAsync(request, cancellationToken);
+
+        return PremiumCalculator.Compute(request.StartDate.AsUtc(), request.EndDate.AsUtc(), request.Type);
+    }
 }

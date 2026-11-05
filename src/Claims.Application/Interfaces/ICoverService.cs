@@ -1,5 +1,4 @@
 using Claims.Application.Contracts;
-using Claims.Domain;
 
 namespace Claims.Application.Interfaces;
 
@@ -14,5 +13,5 @@ public interface ICoverService
     /// <returns><c>false</c> when there is no cover with this id.</returns>
     Task<bool> DeleteAsync(string id, CancellationToken cancellationToken);
 
-    decimal ComputePremium(DateTime startDate, DateTime endDate, CoverType coverType);
+    Task<decimal> ComputePremiumAsync(CreateCoverRequest request, CancellationToken cancellationToken);
 }

@@ -60,14 +60,14 @@ Split into small commits, so that each move can be read on its own. Only 2e chan
 - 2e. Return 404 for unknown ids and 204 after a delete, and audit a delete only when something was deleted.
 - Done when: controllers contain no logic and depend only on the application layer.
 
-### 3. Task 5: premium: `in progress`
+### 3. Task 5: premium: `done`
 
 - Write tests for the desired formula first and see them fail.
 - Move the formula to `PremiumCalculator` in the domain and fix it. Known bugs: days are counted up to
   three times because of missing `else`, day 366 is free, and a partial day counts as a whole one.
 - Done when: tests cover the boundaries at days 30, 31, 180, 181, 365 and 366 for each kind of type.
 
-### 4. Task 2: validation: `todo`
+### 4. Task 2: validation: `in progress`
 
 - Add validators for covers and claims with tests for each rule, using `TimeProvider`.
 - Return failures as a 400 `ProblemDetails` response.

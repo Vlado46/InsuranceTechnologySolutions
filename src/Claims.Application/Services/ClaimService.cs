@@ -1,10 +1,14 @@
 using Claims.Application.Contracts;
 using Claims.Application.Interfaces;
 using Claims.Domain;
+using FluentValidation;
 
 namespace Claims.Application.Services;
 
-public class ClaimService(IClaimRepository claims, IAuditer auditer) : IClaimService
+public class ClaimService(
+    IClaimRepository claims,
+    IValidator<CreateClaimRequest> validator,
+    IAuditer auditer) : IClaimService
 {
     public async Task<IReadOnlyList<ClaimResponse>> GetAllAsync(CancellationToken cancellationToken)
     {
@@ -20,11 +24,13 @@ public class ClaimService(IClaimRepository claims, IAuditer auditer) : IClaimSer
 
     public async Task<ClaimResponse> CreateAsync(CreateClaimRequest request, CancellationToken cancellationToken)
     {
+        await validator.ValidateAndThrowAsync(request, cancellationToken);
+
         var claim = new Claim
         {
             Id = Guid.NewGuid().ToString(),
             CoverId = request.CoverId,
-            Created = request.Created,
+            Created = request.Created.AsUtc(),
             Name = request.Name,
             Type = request.Type,
             DamageCost = request.DamageCost

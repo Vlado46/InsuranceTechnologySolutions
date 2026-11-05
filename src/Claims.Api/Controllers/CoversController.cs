@@ -10,8 +10,9 @@ namespace Claims.Api.Controllers;
 public class CoversController(ICoverService covers) : ControllerBase
 {
     [HttpPost("compute")]
-    public ActionResult<decimal> ComputePremium(DateTime startDate, DateTime endDate, CoverType coverType) =>
-        Ok(covers.ComputePremium(startDate, endDate, coverType));
+    public async Task<ActionResult<decimal>> ComputePremiumAsync(
+        DateTime startDate, DateTime endDate, CoverType coverType, CancellationToken cancellationToken) =>
+        Ok(await covers.ComputePremiumAsync(new CreateCoverRequest(startDate, endDate, coverType), cancellationToken));
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<CoverResponse>>> GetAsync(CancellationToken cancellationToken) =>
