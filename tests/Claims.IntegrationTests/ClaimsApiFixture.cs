@@ -1,6 +1,8 @@
+using Claims.Infrastructure.Auditing;
 using Claims.IntegrationTests;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Testcontainers.MongoDb;
 using Testcontainers.MsSql;
@@ -22,12 +24,7 @@ public sealed class ClaimsApiFixture : IAsyncLifetime
     {
         await Task.WhenAll(_sqlContainer.StartAsync(), _mongoContainer.StartAsync());
 
-        _factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
-        {
-            builder.UseEnvironment("Testing");
-            builder.UseSetting("ConnectionStrings:Audit", _sqlContainer.GetConnectionString());
-            builder.UseSetting("ConnectionStrings:Mongo", _mongoContainer.GetConnectionString());
-        });
+        _factory = CreateFactory();
     }
 
     public async ValueTask DisposeAsync()
@@ -39,5 +36,15 @@ public sealed class ClaimsApiFixture : IAsyncLifetime
 
     public HttpClient CreateClient() => _factory.CreateClient();
 
-    public IServiceScope CreateScope() => _factory.Services.CreateScope();
+    /// <summary>Another instance of the API on the same databases, for tests that shut it down.</summary>
+    public WebApplicationFactory<Program> CreateFactory() =>
+        new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
+        {
+            builder.UseEnvironment("Testing");
+            builder.UseSetting("ConnectionStrings:Audit", _sqlContainer.GetConnectionString());
+            builder.UseSetting("ConnectionStrings:Mongo", _mongoContainer.GetConnectionString());
+        });
+
+    public Task<AuditContext> CreateAuditContextAsync() =>
+        _factory.Services.GetRequiredService<IDbContextFactory<AuditContext>>().CreateDbContextAsync();
 }

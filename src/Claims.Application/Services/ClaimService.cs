@@ -8,7 +8,8 @@ namespace Claims.Application.Services;
 public class ClaimService(
     IClaimRepository claims,
     IValidator<CreateClaimRequest> validator,
-    IAuditer auditer) : IClaimService
+    IAuditQueue auditQueue,
+    TimeProvider timeProvider) : IClaimService
 {
     public async Task<IReadOnlyList<ClaimResponse>> GetAllAsync(CancellationToken cancellationToken)
     {
@@ -37,7 +38,7 @@ public class ClaimService(
         };
 
         await claims.AddAsync(claim, cancellationToken);
-        auditer.AuditClaim(claim.Id, "POST");
+        await AuditAsync(claim.Id, AuditOperation.Create);
 
         return ClaimResponse.From(claim);
     }
@@ -47,9 +48,12 @@ public class ClaimService(
         var deleted = await claims.DeleteAsync(id, cancellationToken);
         if (deleted)
         {
-            auditer.AuditClaim(id, "DELETE");
+            await AuditAsync(id, AuditOperation.Delete);
         }
 
         return deleted;
     }
+
+    private ValueTask AuditAsync(string id, AuditOperation operation) =>
+        auditQueue.EnqueueAsync(new AuditEntry(AuditTarget.Claim, id, operation, timeProvider.GetUtcNow().UtcDateTime));
 }

@@ -13,8 +13,8 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         // Connection strings are read inside these lambdas so that integration tests can supply their own.
-        services.AddDbContext<AuditContext>(options =>
-            options.UseSqlServer(GetConnectionString(configuration, "Audit")));
+        services.AddDbContextFactory<AuditContext>(options =>
+            options.UseSqlServer(GetConnectionString(configuration, "Audit"), sql => sql.EnableRetryOnFailure()));
 
         services.AddSingleton<IMongoClient>(_ => new MongoClient(GetConnectionString(configuration, "Mongo")));
         services.AddDbContext<ClaimsContext>((provider, options) =>
@@ -22,7 +22,10 @@ public static class DependencyInjection
 
         services.AddScoped<IClaimRepository, ClaimRepository>();
         services.AddScoped<ICoverRepository, CoverRepository>();
-        services.AddScoped<IAuditer, Auditer>();
+
+        services.AddSingleton<AuditQueue>();
+        services.AddSingleton<IAuditQueue>(provider => provider.GetRequiredService<AuditQueue>());
+        services.AddHostedService<AuditWorker>();
 
         return services;
     }

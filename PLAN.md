@@ -67,7 +67,7 @@ Split into small commits, so that each move can be read on its own. Only 2e chan
   three times because of missing `else`, day 366 is free, and a partial day counts as a whole one.
 - Done when: tests cover the boundaries at days 30, 31, 180, 181, 365 and 366 for each kind of type.
 
-### 4. Task 2: validation: `in progress`
+### 4. Task 2: validation: `done`
 
 - Add validators for covers and claims with tests for each rule, using `TimeProvider`.
 - Return failures as a 400 `ProblemDetails` response.
@@ -75,7 +75,7 @@ Split into small commits, so that each move can be read on its own. Only 2e chan
   machine a cover moves to the previous day.
 - Done when: every rule from the assignment has a passing and a failing test.
 
-### 5. Task 3: audit without blocking the request: `todo`
+### 5. Task 3: audit without blocking the request: `in progress`
 
 - Add an `IAuditQueue` interface, a `Channel` implementation and a worker.
 - Take the timestamp when the change happens, not when it is stored.

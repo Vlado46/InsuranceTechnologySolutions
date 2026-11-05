@@ -8,7 +8,8 @@ namespace Claims.Application.Services;
 public class CoverService(
     ICoverRepository covers,
     IValidator<CreateCoverRequest> validator,
-    IAuditer auditer) : ICoverService
+    IAuditQueue auditQueue,
+    TimeProvider timeProvider) : ICoverService
 {
     public async Task<IReadOnlyList<CoverResponse>> GetAllAsync(CancellationToken cancellationToken)
     {
@@ -38,7 +39,7 @@ public class CoverService(
         };
 
         await covers.AddAsync(cover, cancellationToken);
-        auditer.AuditCover(cover.Id, "POST");
+        await AuditAsync(cover.Id, AuditOperation.Create);
 
         return CoverResponse.From(cover);
     }
@@ -48,7 +49,7 @@ public class CoverService(
         var deleted = await covers.DeleteAsync(id, cancellationToken);
         if (deleted)
         {
-            auditer.AuditCover(id, "DELETE");
+            await AuditAsync(id, AuditOperation.Delete);
         }
 
         return deleted;
@@ -60,4 +61,7 @@ public class CoverService(
 
         return PremiumCalculator.Compute(request.StartDate.AsUtc(), request.EndDate.AsUtc(), request.Type);
     }
+
+    private ValueTask AuditAsync(string id, AuditOperation operation) =>
+        auditQueue.EnqueueAsync(new AuditEntry(AuditTarget.Cover, id, operation, timeProvider.GetUtcNow().UtcDateTime));
 }

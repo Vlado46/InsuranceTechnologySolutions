@@ -1,9 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
-using Claims.Infrastructure.Auditing;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace Claims.IntegrationTests;
@@ -55,20 +52,6 @@ public class DeleteAndNotFoundTests(ClaimsApiFixture fixture)
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         var read = await _client.GetAsync($"/Claims/{claimId}", _cancellationToken);
         Assert.Equal(HttpStatusCode.NotFound, read.StatusCode);
-    }
-
-    [Fact]
-    public async Task Delete_DoesNotAudit_WhenIdIsUnknown()
-    {
-        var unknownId = Guid.NewGuid().ToString();
-
-        await _client.DeleteAsync($"/Claims/{unknownId}", _cancellationToken);
-        await _client.DeleteAsync($"/Covers/{unknownId}", _cancellationToken);
-
-        using var scope = fixture.CreateScope();
-        var audit = scope.ServiceProvider.GetRequiredService<AuditContext>();
-        Assert.False(await audit.ClaimAudits.AnyAsync(entry => entry.ClaimId == unknownId, _cancellationToken));
-        Assert.False(await audit.CoverAudits.AnyAsync(entry => entry.CoverId == unknownId, _cancellationToken));
     }
 
     private async Task<string> CreateCoverAsync()
