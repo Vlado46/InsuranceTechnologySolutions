@@ -32,11 +32,11 @@ Claims.Api ─────────► Claims.Application ──► Claims.Do
 
 Each step is one commit, or a few small ones. Status: `todo`, `in progress`, `done`.
 
-### 0. Project setup: `in progress`
+### 0. Project setup: `done`
 
 - Add `CLAUDE.md`, this plan and the `next-step` skill.
 
-### 1. Make the application start: `todo`
+### 1. Make the application start: `in progress`
 
 The template does not start, even with Docker running.
 
