@@ -109,3 +109,4 @@ The log of where I changed direction or corrected the assistant. Filled in as we
 | Step | What came up | Decision | Why |
 |---|---|---|---|
 | Start | The first attempt was built in one go | Start again, step by step | I need to understand and explain every part |
+| 1 | Audit models allowed nulls, the migration did not | Change the models, keep the migration | An audit row without an id or operation has no meaning, so the schema was right |

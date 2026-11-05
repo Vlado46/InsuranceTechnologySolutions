@@ -1,0 +1,14 @@
+# Local databases for running the API. The password is for these containers only.
+services:
+  mongo:
+    image: mongo:8
+    ports:
+      - "27017:27017"
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: Local_dev_only_1
+    ports:
+      - "1433:1433"

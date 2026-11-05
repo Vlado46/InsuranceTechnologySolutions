@@ -1,18 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
-using Xunit;
+﻿using Xunit;
 
 namespace Claims.Tests
 {
-    public class ClaimsControllerTests
+    public class ClaimsControllerTests(ClaimsApiFixture fixture)
     {
         [Fact]
         public async Task Get_Claims()
         {
-            var application = new WebApplicationFactory<Program>()
-                .WithWebHostBuilder(_ =>
-                {});
-
-            var client = application.CreateClient();
+            var client = fixture.CreateClient();
 
             var response = await client.GetAsync("/Claims");
 

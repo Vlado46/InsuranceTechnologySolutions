@@ -2,24 +2,14 @@ using Claims.Auditing;
 using Claims.Controllers;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
-using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
-using Testcontainers.MongoDb;
-using Testcontainers.MsSql;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Start Testcontainers for SQL Server and MongoDB
-var sqlContainer = new MsSqlBuilder(RuntimeInformation.IsOSPlatform(OSPlatform.Linux)
-        ? "mcr.microsoft.com/mssql/server:2022-latest"
-        : "mcr.microsoft.com/mssql/server:2019-CU18-ubuntu-20.04")
-    .Build();
-
-var mongoContainer = new MongoDbBuilder("mongo:latest")
-    .Build();
-
-await sqlContainer.StartAsync();
-await mongoContainer.StartAsync();
+// Read inside the DbContext options so that integration tests can supply their own connection strings.
+string GetConnectionString(string name) =>
+    builder.Configuration.GetConnectionString(name)
+        ?? throw new InvalidOperationException($"Connection string '{name}' is not configured.");
 
 // Add services to the container.
 builder.Services
@@ -30,11 +20,11 @@ builder.Services
     });
 
 builder.Services.AddDbContext<AuditContext>(options =>
-    options.UseSqlServer(sqlContainer.GetConnectionString()));
+    options.UseSqlServer(GetConnectionString("Audit")));
 
 builder.Services.AddDbContext<ClaimsContext>(options =>
 {
-    var client = new MongoClient(mongoContainer.GetConnectionString());
+    var client = new MongoClient(GetConnectionString("Mongo"));
     var database = client.GetDatabase(builder.Configuration["MongoDb:DatabaseName"]); // Use a default/test database name
     options.UseMongoDB(database.Client, database.DatabaseNamespace.DatabaseName);
 });
