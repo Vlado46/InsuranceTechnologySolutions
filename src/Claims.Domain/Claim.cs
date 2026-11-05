@@ -4,17 +4,17 @@ namespace Claims.Domain
 {
     public class Claim
     {
-        public string Id { get; set; }
+        public required string Id { get; init; }
 
-        public string CoverId { get; set; }
+        public required string CoverId { get; init; }
 
-        public DateTime Created { get; set; }
+        public DateTime Created { get; init; }
 
-        public string Name { get; set; }
+        public required string Name { get; init; }
 
-        public ClaimType Type { get; set; }
+        public ClaimType Type { get; init; }
 
-        public decimal DamageCost { get; set; }
+        public decimal DamageCost { get; init; }
     }
 
     public enum ClaimType

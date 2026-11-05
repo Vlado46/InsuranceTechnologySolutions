@@ -2,15 +2,15 @@ namespace Claims.Domain;
 
 public class Cover
 {
-    public string Id { get; set; }
+    public required string Id { get; init; }
 
-    public DateTime StartDate { get; set; }
+    public DateTime StartDate { get; init; }
 
-    public DateTime EndDate { get; set; }
+    public DateTime EndDate { get; init; }
 
-    public CoverType Type { get; set; }
+    public CoverType Type { get; init; }
 
-    public decimal Premium { get; set; }
+    public decimal Premium { get; init; }
 }
 
 public enum CoverType

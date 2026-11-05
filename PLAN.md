@@ -48,16 +48,17 @@ The template does not start, even with Docker running.
 - Replace the vulnerable transitive `System.Security.Cryptography.Pkcs` package.
 - Done when: the existing test passes and the API runs from Visual Studio.
 
-### 2. Task 1: introduce layers, no behaviour change: `in progress`
+### 2. Task 1: introduce layers: `in progress`
 
-Split into small commits, so that each move can be read on its own.
+Split into small commits, so that each move can be read on its own. Only 2e changes behaviour on purpose.
 
 - 2a. Move the `[Bson]` attributes out of the entities and into the `DbContext`. Documents stay the same.
 - 2b. Create `Claims.Domain` and `Claims.Infrastructure`, move the API and tests into `src/` and `tests/`.
   `ClaimsContext` leaves the controller file.
 - 2c. Add `Claims.Application` with repository interfaces, and the repositories.
 - 2d. Add services, request and response types. Controllers become thin.
-- Done when: endpoints behave as before and controllers contain no logic.
+- 2e. Return 404 for unknown ids and 204 after a delete, and audit a delete only when something was deleted.
+- Done when: controllers contain no logic and depend only on the application layer.
 
 ### 3. Task 5: premium: `todo`
 
@@ -112,3 +113,4 @@ The log of where I changed direction or corrected the assistant. Filled in as we
 | Start | The first attempt was built in one go | Start again, step by step | I need to understand and explain every part |
 | 1 | Audit models allowed nulls, the migration did not | Change the models, keep the migration | An audit row without an id or operation has no meaning, so the schema was right |
 | 2 | Moving entities first would make `Claims.Domain` depend on MongoDB for one commit | Remove the `[Bson]` attributes before creating the projects, and create `Claims.Application` only when it gets code | The domain never depends on the database, and the history has no empty project |
+| 2 | Moving to services and returning 404 would land in one big diff | Keep 2d a plain move and put the 404 change in its own step, 2e | A deliberate behaviour change should be easy to see in review |

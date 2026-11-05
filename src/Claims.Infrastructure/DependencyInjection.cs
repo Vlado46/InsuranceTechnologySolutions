@@ -22,6 +22,7 @@ public static class DependencyInjection
 
         services.AddScoped<IClaimRepository, ClaimRepository>();
         services.AddScoped<ICoverRepository, CoverRepository>();
+        services.AddScoped<IAuditer, Auditer>();
 
         return services;
     }

@@ -1,0 +1,44 @@
+using Claims.Application.Contracts;
+using Claims.Application.Interfaces;
+using Claims.Domain;
+
+namespace Claims.Application.Services;
+
+public class ClaimService(IClaimRepository claims, IAuditer auditer) : IClaimService
+{
+    public async Task<IReadOnlyList<ClaimResponse>> GetAllAsync(CancellationToken cancellationToken)
+    {
+        var all = await claims.GetAllAsync(cancellationToken);
+        return all.Select(ClaimResponse.From).ToList();
+    }
+
+    public async Task<ClaimResponse?> GetByIdAsync(string id, CancellationToken cancellationToken)
+    {
+        var claim = await claims.GetByIdAsync(id, cancellationToken);
+        return claim is null ? null : ClaimResponse.From(claim);
+    }
+
+    public async Task<ClaimResponse> CreateAsync(CreateClaimRequest request, CancellationToken cancellationToken)
+    {
+        var claim = new Claim
+        {
+            Id = Guid.NewGuid().ToString(),
+            CoverId = request.CoverId,
+            Created = request.Created,
+            Name = request.Name,
+            Type = request.Type,
+            DamageCost = request.DamageCost
+        };
+
+        await claims.AddAsync(claim, cancellationToken);
+        auditer.AuditClaim(claim.Id, "POST");
+
+        return ClaimResponse.From(claim);
+    }
+
+    public async Task DeleteAsync(string id, CancellationToken cancellationToken)
+    {
+        auditer.AuditClaim(id, "DELETE");
+        await claims.DeleteAsync(id, cancellationToken);
+    }
+}

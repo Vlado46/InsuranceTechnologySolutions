@@ -1,6 +1,8 @@
-﻿namespace Claims.Infrastructure.Auditing
+﻿using Claims.Application.Interfaces;
+
+namespace Claims.Infrastructure.Auditing
 {
-    public class Auditer
+    public class Auditer : IAuditer
     {
         private readonly AuditContext _auditContext;
 
