@@ -84,13 +84,13 @@ Split into small commits, so that each move can be read on its own. Only 2e chan
 - Audit only after a successful change.
 - Done when: an integration test sees the audit row, including after a shutdown.
 
-### 6. Task 4: fill the test gaps: `in progress`
+### 6. Task 4: fill the test gaps: `done`
 
 - Unit tests for the services: what is stored and audited, and what is not when validation fails.
 - Integration tests for the full API against real databases.
 - Done when: the whole suite passes several runs in a row and the build has no warnings.
 
-### 7. Documentation and pull request: `todo`
+### 7. Documentation and pull request: `done`
 
 - `README.md`: how to run it, the structure, the assumptions and the known limitations.
 - PR text answering the three questions from the assignment.
@@ -114,3 +114,6 @@ The log of where I changed direction or corrected the assistant. Filled in as we
 | 1 | Audit models allowed nulls, the migration did not | Change the models, keep the migration | An audit row without an id or operation has no meaning, so the schema was right |
 | 2 | Moving entities first would make `Claims.Domain` depend on MongoDB for one commit | Remove the `[Bson]` attributes before creating the projects, and create `Claims.Application` only when it gets code | The domain never depends on the database, and the history has no empty project |
 | 2 | Moving to services and returning 404 would land in one big diff | Keep 2d a plain move and put the 404 change in its own step, 2e | A deliberate behaviour change should be easy to see in review |
+| 5 | A delete could not be audited after the change if the audit write failed | Keep the in-memory queue and log failed writes | Requests no longer fail because of the audit database. A crash can still lose queued entries, which is documented |
+| 6 | A test proved `compute` stores nothing by comparing lists shared with other tests | Remove it and rely on the unit test | The unit test proves the same thing without depending on other tests |
+| Review | Opening each diff and repeating test runs slowed the review down | Write the diff to a file and run the tests once per step | Keep the feedback loop short; repeat runs only for background work |
