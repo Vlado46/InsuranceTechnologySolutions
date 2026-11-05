@@ -32,11 +32,11 @@ Claims.Api ─────────► Claims.Application ──► Claims.Do
 
 Each step is one commit, or a few small ones. Status: `todo`, `in progress`, `done`.
 
-### 0. Project setup: `in progress`
+### 0. Project setup: `done`
 
 - Add `CLAUDE.md`, this plan and the `next-step` skill.
 
-### 1. Make the application start: `todo`
+### 1. Make the application start: `done`
 
 The template does not start, even with Docker running.
 
@@ -48,24 +48,26 @@ The template does not start, even with Docker running.
 - Replace the vulnerable transitive `System.Security.Cryptography.Pkcs` package.
 - Done when: the existing test passes and the API runs from Visual Studio.
 
-### 2. Task 1: introduce layers, no behaviour change: `todo`
+### 2. Task 1: introduce layers: `done`
 
-Split into small commits, so that each move can be read on its own.
+Split into small commits, so that each move can be read on its own. Only 2e changes behaviour on purpose.
 
-- 2a. Create the projects and move files. Nothing else changes.
-- 2b. Move the `[Bson]` attributes out of the entities and into the `DbContext`.
-- 2c. Add repositories. `ClaimsContext` leaves the controller file.
+- 2a. Move the `[Bson]` attributes out of the entities and into the `DbContext`. Documents stay the same.
+- 2b. Create `Claims.Domain` and `Claims.Infrastructure`, move the API and tests into `src/` and `tests/`.
+  `ClaimsContext` leaves the controller file.
+- 2c. Add `Claims.Application` with repository interfaces, and the repositories.
 - 2d. Add services, request and response types. Controllers become thin.
-- Done when: endpoints behave as before and controllers contain no logic.
+- 2e. Return 404 for unknown ids and 204 after a delete, and audit a delete only when something was deleted.
+- Done when: controllers contain no logic and depend only on the application layer.
 
-### 3. Task 5: premium: `todo`
+### 3. Task 5: premium: `done`
 
 - Write tests for the desired formula first and see them fail.
 - Move the formula to `PremiumCalculator` in the domain and fix it. Known bugs: days are counted up to
   three times because of missing `else`, day 366 is free, and a partial day counts as a whole one.
 - Done when: tests cover the boundaries at days 30, 31, 180, 181, 365 and 366 for each kind of type.
 
-### 4. Task 2: validation: `todo`
+### 4. Task 2: validation: `done`
 
 - Add validators for covers and claims with tests for each rule, using `TimeProvider`.
 - Return failures as a 400 `ProblemDetails` response.
@@ -73,7 +75,7 @@ Split into small commits, so that each move can be read on its own.
   machine a cover moves to the previous day.
 - Done when: every rule from the assignment has a passing and a failing test.
 
-### 5. Task 3: audit without blocking the request: `todo`
+### 5. Task 3: audit without blocking the request: `done`
 
 - Add an `IAuditQueue` interface, a `Channel` implementation and a worker.
 - Take the timestamp when the change happens, not when it is stored.
@@ -82,13 +84,13 @@ Split into small commits, so that each move can be read on its own.
 - Audit only after a successful change.
 - Done when: an integration test sees the audit row, including after a shutdown.
 
-### 6. Task 4: fill the test gaps: `todo`
+### 6. Task 4: fill the test gaps: `done`
 
 - Unit tests for the services: what is stored and audited, and what is not when validation fails.
 - Integration tests for the full API against real databases.
 - Done when: the whole suite passes several runs in a row and the build has no warnings.
 
-### 7. Documentation and pull request: `todo`
+### 7. Documentation and pull request: `done`
 
 - `README.md`: how to run it, the structure, the assumptions and the known limitations.
 - PR text answering the three questions from the assignment.
@@ -109,3 +111,9 @@ The log of where I changed direction or corrected the assistant. Filled in as we
 | Step | What came up | Decision | Why |
 |---|---|---|---|
 | Start | The first attempt was built in one go | Start again, step by step | I need to understand and explain every part |
+| 1 | Audit models allowed nulls, the migration did not | Change the models, keep the migration | An audit row without an id or operation has no meaning, so the schema was right |
+| 2 | Moving entities first would make `Claims.Domain` depend on MongoDB for one commit | Remove the `[Bson]` attributes before creating the projects, and create `Claims.Application` only when it gets code | The domain never depends on the database, and the history has no empty project |
+| 2 | Moving to services and returning 404 would land in one big diff | Keep 2d a plain move and put the 404 change in its own step, 2e | A deliberate behaviour change should be easy to see in review |
+| 5 | A delete could not be audited after the change if the audit write failed | Keep the in-memory queue and log failed writes | Requests no longer fail because of the audit database. A crash can still lose queued entries, which is documented |
+| 6 | A test proved `compute` stores nothing by comparing lists shared with other tests | Remove it and rely on the unit test | The unit test proves the same thing without depending on other tests |
+| Review | Opening each diff and repeating test runs slowed the review down | Write the diff to a file and run the tests once per step | Keep the feedback loop short; repeat runs only for background work |
