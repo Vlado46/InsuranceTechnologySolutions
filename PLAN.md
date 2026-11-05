@@ -36,7 +36,7 @@ Each step is one commit, or a few small ones. Status: `todo`, `in progress`, `do
 
 - Add `CLAUDE.md`, this plan and the `next-step` skill.
 
-### 1. Make the application start: `in progress`
+### 1. Make the application start: `done`
 
 The template does not start, even with Docker running.
 
@@ -48,13 +48,14 @@ The template does not start, even with Docker running.
 - Replace the vulnerable transitive `System.Security.Cryptography.Pkcs` package.
 - Done when: the existing test passes and the API runs from Visual Studio.
 
-### 2. Task 1: introduce layers, no behaviour change: `todo`
+### 2. Task 1: introduce layers, no behaviour change: `in progress`
 
 Split into small commits, so that each move can be read on its own.
 
-- 2a. Create the projects and move files. Nothing else changes.
-- 2b. Move the `[Bson]` attributes out of the entities and into the `DbContext`.
-- 2c. Add repositories. `ClaimsContext` leaves the controller file.
+- 2a. Move the `[Bson]` attributes out of the entities and into the `DbContext`. Documents stay the same.
+- 2b. Create `Claims.Domain` and `Claims.Infrastructure`, move the API and tests into `src/` and `tests/`.
+  `ClaimsContext` leaves the controller file.
+- 2c. Add `Claims.Application` with repository interfaces, and the repositories.
 - 2d. Add services, request and response types. Controllers become thin.
 - Done when: endpoints behave as before and controllers contain no logic.
 
@@ -110,3 +111,4 @@ The log of where I changed direction or corrected the assistant. Filled in as we
 |---|---|---|---|
 | Start | The first attempt was built in one go | Start again, step by step | I need to understand and explain every part |
 | 1 | Audit models allowed nulls, the migration did not | Change the models, keep the migration | An audit row without an id or operation has no meaning, so the schema was right |
+| 2 | Moving entities first would make `Claims.Domain` depend on MongoDB for one commit | Remove the `[Bson]` attributes before creating the projects, and create `Claims.Application` only when it gets code | The domain never depends on the database, and the history has no empty project |
