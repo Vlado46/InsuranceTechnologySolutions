@@ -1,15 +1,9 @@
+using Claims.Infrastructure;
 using Claims.Infrastructure.Auditing;
-using Claims.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using MongoDB.Driver;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Read inside the DbContext options so that integration tests can supply their own connection strings.
-string GetConnectionString(string name) =>
-    builder.Configuration.GetConnectionString(name)
-        ?? throw new InvalidOperationException($"Connection string '{name}' is not configured.");
 
 // Add services to the container.
 builder.Services
@@ -19,15 +13,7 @@ builder.Services
         x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 
-builder.Services.AddDbContext<AuditContext>(options =>
-    options.UseSqlServer(GetConnectionString("Audit")));
-
-builder.Services.AddDbContext<ClaimsContext>(options =>
-{
-    var client = new MongoClient(GetConnectionString("Mongo"));
-    var database = client.GetDatabase(builder.Configuration["MongoDb:DatabaseName"]); // Use a default/test database name
-    options.UseMongoDB(database.Client, database.DatabaseNamespace.DatabaseName);
-});
+builder.Services.AddInfrastructure(builder.Configuration);
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

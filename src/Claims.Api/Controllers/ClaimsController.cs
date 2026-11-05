@@ -1,6 +1,6 @@
+using Claims.Application.Interfaces;
 using Claims.Domain;
 using Claims.Infrastructure.Auditing;
-using Claims.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -11,42 +11,42 @@ namespace Claims.Api.Controllers
     public class ClaimsController : ControllerBase
     {
         private readonly ILogger<ClaimsController> _logger;
-        private readonly ClaimsContext _claimsContext;
+        private readonly IClaimRepository _claims;
         private readonly Auditer _auditer;
 
-        public ClaimsController(ILogger<ClaimsController> logger, ClaimsContext claimsContext, AuditContext auditContext)
+        public ClaimsController(ILogger<ClaimsController> logger, IClaimRepository claims, AuditContext auditContext)
         {
             _logger = logger;
-            _claimsContext = claimsContext;
+            _claims = claims;
             _auditer = new Auditer(auditContext);
         }
 
         [HttpGet]
-        public async Task<IEnumerable<Claim>> GetAsync()
+        public async Task<IEnumerable<Claim>> GetAsync(CancellationToken cancellationToken)
         {
-            return await _claimsContext.GetClaimsAsync();
+            return await _claims.GetAllAsync(cancellationToken);
         }
 
         [HttpPost]
-        public async Task<ActionResult> CreateAsync(Claim claim)
+        public async Task<ActionResult> CreateAsync(Claim claim, CancellationToken cancellationToken)
         {
             claim.Id = Guid.NewGuid().ToString();
-            await _claimsContext.AddItemAsync(claim);
+            await _claims.AddAsync(claim, cancellationToken);
             _auditer.AuditClaim(claim.Id, "POST");
             return Ok(claim);
         }
 
         [HttpDelete("{id}")]
-        public async Task DeleteAsync(string id)
+        public async Task DeleteAsync(string id, CancellationToken cancellationToken)
         {
             _auditer.AuditClaim(id, "DELETE");
-            await _claimsContext.DeleteItemAsync(id);
+            await _claims.DeleteAsync(id, cancellationToken);
         }
 
         [HttpGet("{id}")]
-        public async Task<Claim> GetAsync(string id)
+        public async Task<Claim?> GetAsync(string id, CancellationToken cancellationToken)
         {
-            return await _claimsContext.GetClaimAsync(id);
+            return await _claims.GetByIdAsync(id, cancellationToken);
         }
     }
 }
