@@ -75,7 +75,7 @@ Split into small commits, so that each move can be read on its own. Only 2e chan
   machine a cover moves to the previous day.
 - Done when: every rule from the assignment has a passing and a failing test.
 
-### 5. Task 3: audit without blocking the request: `in progress`
+### 5. Task 3: audit without blocking the request: `done`
 
 - Add an `IAuditQueue` interface, a `Channel` implementation and a worker.
 - Take the timestamp when the change happens, not when it is stored.
@@ -84,7 +84,7 @@ Split into small commits, so that each move can be read on its own. Only 2e chan
 - Audit only after a successful change.
 - Done when: an integration test sees the audit row, including after a shutdown.
 
-### 6. Task 4: fill the test gaps: `todo`
+### 6. Task 4: fill the test gaps: `in progress`
 
 - Unit tests for the services: what is stored and audited, and what is not when validation fails.
 - Integration tests for the full API against real databases.
