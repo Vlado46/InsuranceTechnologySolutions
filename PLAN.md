@@ -48,7 +48,7 @@ The template does not start, even with Docker running.
 - Replace the vulnerable transitive `System.Security.Cryptography.Pkcs` package.
 - Done when: the existing test passes and the API runs from Visual Studio.
 
-### 2. Task 1: introduce layers: `in progress`
+### 2. Task 1: introduce layers: `done`
 
 Split into small commits, so that each move can be read on its own. Only 2e changes behaviour on purpose.
 
@@ -60,7 +60,7 @@ Split into small commits, so that each move can be read on its own. Only 2e chan
 - 2e. Return 404 for unknown ids and 204 after a delete, and audit a delete only when something was deleted.
 - Done when: controllers contain no logic and depend only on the application layer.
 
-### 3. Task 5: premium: `todo`
+### 3. Task 5: premium: `in progress`
 
 - Write tests for the desired formula first and see them fail.
 - Move the formula to `PremiumCalculator` in the domain and fix it. Known bugs: days are counted up to
