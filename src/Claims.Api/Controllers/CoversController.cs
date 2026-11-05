@@ -18,14 +18,17 @@ public class CoversController(ICoverService covers) : ControllerBase
         Ok(await covers.GetAllAsync(cancellationToken));
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<CoverResponse>> GetAsync(string id, CancellationToken cancellationToken) =>
-        Ok(await covers.GetByIdAsync(id, cancellationToken));
+    public async Task<ActionResult<CoverResponse>> GetAsync(string id, CancellationToken cancellationToken)
+    {
+        var cover = await covers.GetByIdAsync(id, cancellationToken);
+        return cover is null ? NotFound() : Ok(cover);
+    }
 
     [HttpPost]
     public async Task<ActionResult<CoverResponse>> CreateAsync(CreateCoverRequest request, CancellationToken cancellationToken) =>
         Ok(await covers.CreateAsync(request, cancellationToken));
 
     [HttpDelete("{id}")]
-    public Task DeleteAsync(string id, CancellationToken cancellationToken) =>
-        covers.DeleteAsync(id, cancellationToken);
+    public async Task<ActionResult> DeleteAsync(string id, CancellationToken cancellationToken) =>
+        await covers.DeleteAsync(id, cancellationToken) ? NoContent() : NotFound();
 }

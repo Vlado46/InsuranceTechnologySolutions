@@ -35,10 +35,15 @@ public class CoverService(ICoverRepository covers, IAuditer auditer) : ICoverSer
         return CoverResponse.From(cover);
     }
 
-    public async Task DeleteAsync(string id, CancellationToken cancellationToken)
+    public async Task<bool> DeleteAsync(string id, CancellationToken cancellationToken)
     {
-        auditer.AuditCover(id, "DELETE");
-        await covers.DeleteAsync(id, cancellationToken);
+        var deleted = await covers.DeleteAsync(id, cancellationToken);
+        if (deleted)
+        {
+            auditer.AuditCover(id, "DELETE");
+        }
+
+        return deleted;
     }
 
     public decimal ComputePremium(DateTime startDate, DateTime endDate, CoverType coverType)

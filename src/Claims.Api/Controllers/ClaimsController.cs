@@ -17,10 +17,13 @@ public class ClaimsController(IClaimService claims) : ControllerBase
         Ok(await claims.CreateAsync(request, cancellationToken));
 
     [HttpDelete("{id}")]
-    public Task DeleteAsync(string id, CancellationToken cancellationToken) =>
-        claims.DeleteAsync(id, cancellationToken);
+    public async Task<ActionResult> DeleteAsync(string id, CancellationToken cancellationToken) =>
+        await claims.DeleteAsync(id, cancellationToken) ? NoContent() : NotFound();
 
     [HttpGet("{id}")]
-    public Task<ClaimResponse?> GetAsync(string id, CancellationToken cancellationToken) =>
-        claims.GetByIdAsync(id, cancellationToken);
+    public async Task<ActionResult<ClaimResponse>> GetAsync(string id, CancellationToken cancellationToken)
+    {
+        var claim = await claims.GetByIdAsync(id, cancellationToken);
+        return claim is null ? NotFound() : Ok(claim);
+    }
 }

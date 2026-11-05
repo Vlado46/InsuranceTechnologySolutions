@@ -36,9 +36,14 @@ public class ClaimService(IClaimRepository claims, IAuditer auditer) : IClaimSer
         return ClaimResponse.From(claim);
     }
 
-    public async Task DeleteAsync(string id, CancellationToken cancellationToken)
+    public async Task<bool> DeleteAsync(string id, CancellationToken cancellationToken)
     {
-        auditer.AuditClaim(id, "DELETE");
-        await claims.DeleteAsync(id, cancellationToken);
+        var deleted = await claims.DeleteAsync(id, cancellationToken);
+        if (deleted)
+        {
+            auditer.AuditClaim(id, "DELETE");
+        }
+
+        return deleted;
     }
 }

@@ -1,6 +1,7 @@
 using Claims.IntegrationTests;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
 using Testcontainers.MongoDb;
 using Testcontainers.MsSql;
 using Xunit;
@@ -37,4 +38,6 @@ public sealed class ClaimsApiFixture : IAsyncLifetime
     }
 
     public HttpClient CreateClient() => _factory.CreateClient();
+
+    public IServiceScope CreateScope() => _factory.Services.CreateScope();
 }

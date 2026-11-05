@@ -10,5 +10,6 @@ public interface IClaimService
 
     Task<ClaimResponse> CreateAsync(CreateClaimRequest request, CancellationToken cancellationToken);
 
-    Task DeleteAsync(string id, CancellationToken cancellationToken);
+    /// <returns><c>false</c> when there is no claim with this id.</returns>
+    Task<bool> DeleteAsync(string id, CancellationToken cancellationToken);
 }

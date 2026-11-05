@@ -11,7 +11,8 @@ public interface ICoverService
 
     Task<CoverResponse> CreateAsync(CreateCoverRequest request, CancellationToken cancellationToken);
 
-    Task DeleteAsync(string id, CancellationToken cancellationToken);
+    /// <returns><c>false</c> when there is no cover with this id.</returns>
+    Task<bool> DeleteAsync(string id, CancellationToken cancellationToken);
 
     decimal ComputePremium(DateTime startDate, DateTime endDate, CoverType coverType);
 }
