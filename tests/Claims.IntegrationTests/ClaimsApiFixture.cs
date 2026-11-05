@@ -1,4 +1,4 @@
-using Claims.Tests;
+using Claims.IntegrationTests;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Testcontainers.MongoDb;
@@ -7,7 +7,7 @@ using Xunit;
 
 [assembly: AssemblyFixture(typeof(ClaimsApiFixture))]
 
-namespace Claims.Tests;
+namespace Claims.IntegrationTests;
 
 /// <summary>Runs the real API against real databases. All tests share one set of containers.</summary>
 public sealed class ClaimsApiFixture : IAsyncLifetime

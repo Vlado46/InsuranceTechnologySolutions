@@ -1,4 +1,4 @@
-namespace Claims;
+namespace Claims.Domain;
 
 public class Cover
 {

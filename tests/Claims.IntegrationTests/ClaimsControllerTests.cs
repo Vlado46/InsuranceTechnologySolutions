@@ -1,6 +1,6 @@
 ﻿using Xunit;
 
-namespace Claims.Tests
+namespace Claims.IntegrationTests
 {
     public class ClaimsControllerTests(ClaimsApiFixture fixture)
     {
