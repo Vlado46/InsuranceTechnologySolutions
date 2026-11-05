@@ -1,5 +1,3 @@
-﻿using System.Text.Json.Serialization;
-
 namespace Claims.Domain
 {
     public class Claim

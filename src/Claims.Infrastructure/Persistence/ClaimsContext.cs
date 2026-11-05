@@ -34,7 +34,7 @@ namespace Claims.Infrastructure.Persistence
                 cover.ToCollection("covers");
                 cover.Property(c => c.StartDate).HasElementName("startDate");
                 cover.Property(c => c.EndDate).HasElementName("endDate");
-                cover.Property(c => c.Type).HasElementName("claimType");
+                cover.Property(c => c.Type).HasElementName("coverType");
                 cover.Property(c => c.Premium).HasElementName("premium");
             });
         }
